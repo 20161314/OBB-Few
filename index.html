@@ -1,0 +1,2283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="OBB-Few is a comprehensive benchmark for few-shot oriented object detection in real-world remote sensing scenarios.">
+  <title>OBB-Few | Few-Shot Oriented Object Detection Benchmark</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root {
+      --primary: #1565c0;
+      --primary-dark: #0d47a1;
+      --accent: #1976d2;
+      --blue-50: #e3f2fd;
+      --blue-100: #bbdefb;
+      --orange-50: #fff3e0;
+      --orange-200: #ffcc80;
+      --ink: #18212b;
+      --muted: #5e6b78;
+      --line: #dce3ea;
+      --surface: #f6f8fa;
+      --white: #ffffff;
+      --nav-height: 64px;
+      --shadow: 0 12px 30px rgba(20, 42, 66, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: calc(var(--nav-height) + 22px);
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--white);
+      font-family: "Source Sans 3", "Segoe UI", sans-serif;
+      font-size: 17px;
+      line-height: 1.68;
+      letter-spacing: 0;
+    }
+
+    body.nav-open { overflow: hidden; }
+
+    a { color: var(--primary); }
+
+    button, a { -webkit-tap-highlight-color: transparent; }
+
+    button { font: inherit; }
+
+    .skip-link {
+      position: fixed;
+      top: 8px;
+      left: 8px;
+      z-index: 1000;
+      padding: 8px 12px;
+      color: var(--white);
+      background: var(--primary-dark);
+      transform: translateY(-150%);
+      transition: transform 0.2s ease;
+    }
+
+    .skip-link:focus { transform: translateY(0); }
+
+    .container {
+      width: min(1100px, calc(100% - 40px));
+      margin-inline: auto;
+    }
+
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: var(--nav-height);
+      border-bottom: 1px solid rgba(220, 227, 234, 0.92);
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      height: 100%;
+    }
+
+    .brand {
+      flex: 0 0 auto;
+      color: var(--ink);
+      font-family: "Source Serif 4", Georgia, serif;
+      font-size: 1.26rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .brand-mark { color: var(--primary); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      margin-left: auto;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .nav-links::-webkit-scrollbar { display: none; }
+
+    .nav-links a {
+      padding: 8px 9px;
+      border-radius: 4px;
+      color: #43515f;
+      font-size: 0.87rem;
+      font-weight: 600;
+      line-height: 1;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: color 0.2s ease, background 0.2s ease;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--primary-dark);
+      background: var(--blue-50);
+    }
+
+    .menu-button {
+      display: none;
+      width: 40px;
+      height: 40px;
+      margin-left: auto;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--ink);
+      background: var(--white);
+      cursor: pointer;
+    }
+
+    .menu-lines,
+    .menu-lines::before,
+    .menu-lines::after {
+      display: block;
+      width: 18px;
+      height: 2px;
+      margin-inline: auto;
+      background: currentColor;
+      content: "";
+    }
+
+    .menu-lines::before { transform: translateY(-6px); }
+    .menu-lines::after { transform: translateY(4px); }
+
+    .scroll-progress {
+      position: absolute;
+      right: 0;
+      bottom: -1px;
+      left: 0;
+      height: 2px;
+      transform: scaleX(0);
+      transform-origin: left;
+      background: var(--primary);
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 92px 0 72px;
+      border-bottom: 1px solid var(--line);
+      background:
+        linear-gradient(#edf3f8 1px, transparent 1px),
+        linear-gradient(90deg, #edf3f8 1px, transparent 1px),
+        linear-gradient(180deg, #f8fbfd 0%, #ffffff 76%);
+      background-size: 32px 32px, 32px 32px, auto;
+    }
+
+    .hero::after {
+      position: absolute;
+      right: -120px;
+      bottom: -150px;
+      width: 440px;
+      height: 310px;
+      border: 46px solid rgba(21, 101, 192, 0.06);
+      border-radius: 50%;
+      content: "";
+      transform: rotate(-15deg);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 990px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 18px;
+      color: var(--primary-dark);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      width: 24px;
+      height: 2px;
+      background: var(--primary);
+      content: "";
+    }
+
+    h1, h2, h3, h4 { line-height: 1.2; }
+
+    h1 {
+      max-width: 1040px;
+      margin: 0 auto;
+      font-family: "Source Serif 4", Georgia, serif;
+      font-size: clamp(2.45rem, 5.3vw, 4.4rem);
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .title-mark { color: var(--primary); }
+
+    .subtitle {
+      margin: 24px 0 7px;
+      color: #465564;
+      font-size: 1.16rem;
+      font-style: italic;
+    }
+
+    .authors {
+      margin: 0;
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 28px 0 32px;
+    }
+
+    .action-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 9px 17px;
+      border: 1px solid var(--primary);
+      border-radius: 999px;
+      color: var(--primary-dark);
+      background: var(--white);
+      font-size: 0.94rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .action-button.primary {
+      color: var(--white);
+      background: var(--primary);
+    }
+
+    .action-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(21, 101, 192, 0.16);
+    }
+
+    .button-icon {
+      width: 17px;
+      height: 17px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .abstract {
+      max-width: 930px;
+      margin: 0 auto;
+      padding: 21px 24px;
+      border-left: 3px solid var(--accent);
+      color: #334250;
+      background: rgba(255, 255, 255, 0.88);
+      text-align: left;
+      box-shadow: var(--shadow);
+    }
+
+    main section {
+      padding: 72px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    main section:nth-of-type(even) { background: #fbfcfd; }
+
+    .section-heading {
+      margin: 0 0 28px;
+      padding-left: 16px;
+      border-left: 5px solid var(--accent);
+      font-family: "Source Serif 4", Georgia, serif;
+      font-size: clamp(1.7rem, 3vw, 2.35rem);
+      letter-spacing: 0;
+    }
+
+    .section-intro {
+      max-width: 920px;
+      margin: -8px 0 30px;
+      color: #3d4c5a;
+      font-size: 1.04rem;
+    }
+
+    .subheading {
+      margin: 38px 0 16px;
+      font-family: "Source Serif 4", Georgia, serif;
+      font-size: 1.36rem;
+      letter-spacing: 0;
+    }
+
+    .highlights-grid,
+    .conflict-grid,
+    .image-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .highlights-grid { grid-template-columns: repeat(3, 1fr); }
+    .conflict-grid { grid-template-columns: repeat(2, 1fr); }
+    .image-grid { grid-template-columns: repeat(3, 1fr); }
+
+    .highlight-card,
+    .conflict-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      box-shadow: 0 8px 22px rgba(24, 33, 43, 0.05);
+    }
+
+    .highlight-card { padding: 24px; }
+
+    .highlight-icon {
+      display: inline-grid;
+      width: 42px;
+      height: 42px;
+      margin-bottom: 16px;
+      place-items: center;
+      border-radius: 6px;
+      color: var(--primary-dark);
+      background: var(--blue-50);
+    }
+
+    .highlight-card h3,
+    .conflict-card h3 {
+      margin: 0 0 8px;
+      font-size: 1.08rem;
+      letter-spacing: 0;
+    }
+
+    .highlight-card p,
+    .conflict-card p { margin: 0; color: var(--muted); }
+
+    .protocol-flow {
+      display: grid;
+      grid-template-columns: 1fr 72px 1fr 72px 1fr;
+      align-items: center;
+      margin: 34px 0;
+      padding: 28px;
+      border: 1px solid #c9d9e8;
+      background: #f4f8fc;
+    }
+
+    .flow-step {
+      min-height: 105px;
+      padding: 18px;
+      border-top: 3px solid var(--primary);
+      background: var(--white);
+      box-shadow: 0 6px 16px rgba(20, 42, 66, 0.07);
+    }
+
+    .flow-step strong { display: block; margin-bottom: 4px; }
+    .flow-step span { color: var(--muted); font-size: 0.92rem; }
+
+    .flow-arrow {
+      position: relative;
+      height: 2px;
+      margin: 0 14px;
+      background: var(--primary);
+    }
+
+    .flow-arrow::after {
+      position: absolute;
+      top: -4px;
+      right: -1px;
+      width: 8px;
+      height: 8px;
+      border-top: 2px solid var(--primary);
+      border-right: 2px solid var(--primary);
+      content: "";
+      transform: rotate(45deg);
+    }
+
+    .conflict-card { overflow: hidden; }
+    .conflict-card h3 { padding: 16px 20px 13px; color: var(--primary-dark); background: var(--blue-50); }
+    .conflict-card p { padding: 0 20px 20px; }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--white);
+      box-shadow: 0 5px 16px rgba(24, 33, 43, 0.04);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.94rem;
+      line-height: 1.4;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #e8edf2;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      color: var(--white);
+      background: #244a70;
+      font-size: 0.84rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    tbody tr:nth-child(even) { background: #f7f9fb; }
+    tbody tr:hover { background: var(--blue-50); }
+    tbody tr:last-child td { border-bottom: 0; }
+
+    .warning-col { background: var(--orange-50); }
+    th.warning-col { color: #573914; background: var(--orange-200); }
+    tbody tr:hover .warning-col { background: #ffe5bd; }
+
+    .ours-row,
+    .ours-row:nth-child(even),
+    .ours-row:hover { background: var(--blue-100); }
+
+    .ours-row td { font-weight: 700; }
+
+    .results-box {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 0;
+      margin-top: 28px;
+      border: 1px solid #b8cee2;
+      background: var(--white);
+    }
+
+    .results-label {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 22px;
+      color: var(--white);
+      background: var(--primary-dark);
+    }
+
+    .results-label strong { font-size: 1.12rem; }
+    .results-label span { margin-top: 2px; color: #cfe4fa; font-size: 0.88rem; }
+
+    .results-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      margin: 0;
+      padding: 17px 26px;
+      gap: 5px 28px;
+      list-style: none;
+    }
+
+    .results-list li { position: relative; padding-left: 14px; }
+    .results-list li::before { position: absolute; left: 0; color: var(--primary); content: "+"; font-weight: 700; }
+
+    .dataset-section .section-intro { margin-bottom: 20px; }
+
+    .dataset-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 28px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .dataset-meta li {
+      padding: 7px 11px;
+      border: 1px solid #c9d7e5;
+      border-radius: 4px;
+      color: #35516d;
+      background: #f5f9fc;
+      font-size: 0.87rem;
+      font-weight: 600;
+    }
+
+    .image-card {
+      position: relative;
+      overflow: hidden;
+      min-width: 0;
+      border-radius: 8px;
+      background: #e0e0e0;
+      aspect-ratio: 3 / 2;
+    }
+
+    .image-card::before {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(31deg, transparent 48%, rgba(255, 255, 255, 0.5) 49%, rgba(255, 255, 255, 0.5) 51%, transparent 52%),
+        repeating-linear-gradient(90deg, transparent 0 54px, rgba(120, 120, 120, 0.08) 54px 55px),
+        repeating-linear-gradient(0deg, transparent 0 54px, rgba(120, 120, 120, 0.08) 54px 55px);
+      content: "";
+    }
+
+    .image-card span {
+      position: absolute;
+      inset: 50% auto auto 50%;
+      width: calc(100% - 28px);
+      color: #757575;
+      font-weight: 600;
+      text-align: center;
+      transform: translate(-50%, -50%);
+    }
+
+    .image-card b {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      padding: 4px 9px;
+      border-radius: 4px;
+      color: #44505a;
+      background: rgba(255, 255, 255, 0.82);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+    }
+
+    details.results-details {
+      margin-top: 24px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--white);
+    }
+
+    details.results-details summary {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 18px;
+      color: #263a4f;
+      font-weight: 700;
+      list-style: none;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    details.results-details summary::-webkit-details-marker { display: none; }
+
+    details.results-details summary::before {
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--primary);
+      border-bottom: 2px solid var(--primary);
+      content: "";
+      transform: rotate(-45deg);
+      transition: transform 0.2s ease;
+    }
+
+    details.results-details[open] summary::before { transform: rotate(45deg); }
+
+    .details-content { padding: 0 18px 18px; }
+
+    .shot-tabs {
+      display: inline-flex;
+      gap: 3px;
+      margin-bottom: 14px;
+      padding: 3px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--surface);
+    }
+
+    .tab-button {
+      min-width: 82px;
+      padding: 7px 11px;
+      border: 0;
+      border-radius: 4px;
+      color: #51606e;
+      background: transparent;
+      font-size: 0.89rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .tab-button:hover { color: var(--primary); }
+    .tab-button.active { color: var(--white); background: var(--primary); }
+
+    .tab-panel[hidden] { display: none; }
+
+    .empty-results {
+      min-height: 175px;
+      padding: 56px 24px;
+      border: 1px dashed #bdc9d3;
+      color: var(--muted);
+      background: var(--surface);
+      text-align: center;
+    }
+
+    .table-note { margin: 11px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .toolbox-banner {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 36px;
+      align-items: start;
+    }
+
+    .feature-list { margin: 24px 0; padding: 0; list-style: none; }
+
+    .feature-list li {
+      position: relative;
+      margin: 10px 0;
+      padding-left: 29px;
+    }
+
+    .feature-list li::before {
+      position: absolute;
+      top: 3px;
+      left: 0;
+      display: grid;
+      width: 20px;
+      height: 20px;
+      place-items: center;
+      border-radius: 50%;
+      color: var(--white);
+      background: var(--primary);
+      content: "\2713";
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .methods-table td:first-child { font-weight: 600; }
+
+    .acknowledgement {
+      padding: 26px 30px;
+      border-left: 4px solid var(--accent);
+      background: var(--blue-50);
+    }
+
+    .acknowledgement p { margin: 0; }
+
+    .citations { display: grid; gap: 18px; }
+
+    .citation-card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #17212b;
+    }
+
+    .citation-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 48px;
+      padding: 8px 10px 8px 18px;
+      color: #e7eef5;
+      background: #263645;
+    }
+
+    .citation-header strong { font-size: 0.95rem; }
+
+    .copy-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 76px;
+      padding: 7px 10px;
+      border: 1px solid #5b6d7d;
+      border-radius: 4px;
+      color: #ecf2f7;
+      background: #34495c;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .copy-button:hover { background: #405a70; }
+
+    pre {
+      margin: 0;
+      padding: 18px 20px;
+      overflow-x: auto;
+      color: #d7e3ed;
+      font: 0.84rem/1.58 Consolas, "Courier New", monospace;
+      tab-size: 2;
+    }
+
+    footer {
+      padding: 34px 0;
+      color: #65727e;
+      background: #101820;
+      text-align: center;
+    }
+
+    footer p { margin: 0; }
+    footer .institution { margin-bottom: 3px; color: #d7e0e7; font-weight: 600; }
+
+    .back-to-top {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 50;
+      display: grid;
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      place-items: center;
+      border: 1px solid var(--primary);
+      border-radius: 6px;
+      color: var(--white);
+      background: var(--primary);
+      box-shadow: 0 8px 20px rgba(21, 101, 192, 0.24);
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .back-to-top.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+
+    @media (max-width: 900px) {
+      :root { --nav-height: 58px; }
+      .container { width: min(100% - 30px, 1100px); }
+      .menu-button { display: block; }
+      .nav-links {
+        position: fixed;
+        top: var(--nav-height);
+        right: 0;
+        left: 0;
+        display: none;
+        max-height: calc(100vh - var(--nav-height));
+        margin: 0;
+        padding: 12px 15px 20px;
+        overflow-y: auto;
+        border-bottom: 1px solid var(--line);
+        background: var(--white);
+        box-shadow: 0 12px 22px rgba(20, 42, 66, 0.12);
+      }
+      .nav-links.open { display: grid; grid-template-columns: repeat(2, 1fr); }
+      .nav-links a { padding: 12px; }
+      .hero { padding: 70px 0 58px; }
+      .highlights-grid { grid-template-columns: 1fr; }
+      .protocol-flow { grid-template-columns: 1fr; gap: 12px; }
+      .flow-arrow { width: 2px; height: 28px; margin: 0 auto; }
+      .flow-arrow::after { top: auto; right: -4px; bottom: 0; transform: rotate(135deg); }
+      .results-box { grid-template-columns: 1fr; }
+      .results-list { padding: 18px 20px; }
+      .toolbox-banner { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 680px) {
+      body { font-size: 16px; }
+      main section { padding: 56px 0; }
+      h1 { font-size: 2.25rem; }
+      .hero::after { display: none; }
+      .abstract { padding: 18px; }
+      .conflict-grid, .image-grid { grid-template-columns: 1fr; }
+      .image-card { aspect-ratio: 16 / 9; }
+      .results-list { grid-template-columns: 1fr; }
+      .tab-button { min-width: 0; }
+      .shot-tabs { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; }
+      .details-content { padding-inline: 10px; }
+      .dataset-meta { gap: 6px; }
+      .citation-header { align-items: flex-start; gap: 10px; }
+      pre { font-size: 0.77rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    }
+  </style>
+  <style id="academic-project-style">
+    /* A restrained academic-project treatment inspired by conventional paper pages. */
+    :root {
+      --primary: #3273dc;
+      --primary-dark: #2458a6;
+      --accent: #3273dc;
+      --blue-50: #f2f7fd;
+      --blue-100: #e8f1fb;
+      --orange-50: #fff8eb;
+      --orange-200: #f6e5bf;
+      --ink: #242424;
+      --muted: #666666;
+      --line: #dddddd;
+      --surface: #f7f7f7;
+      --white: #ffffff;
+      --nav-height: 52px;
+      --shadow: none;
+    }
+
+    html { scroll-padding-top: calc(var(--nav-height) + 18px); }
+
+    body {
+      color: var(--ink);
+      font-family: "Noto Sans", Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+      background: #ffffff;
+    }
+
+    .container { width: min(1000px, calc(100% - 40px)); }
+
+    .site-nav {
+      height: var(--nav-height);
+      border-bottom: 1px solid #e5e5e5;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: none;
+    }
+
+    .nav-inner { gap: 18px; }
+
+    .brand {
+      color: #222222;
+      font-family: "Noto Sans", Arial, sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .brand-mark { color: inherit; }
+    .nav-links { gap: 0; }
+
+    .nav-links a {
+      padding: 17px 7px 15px;
+      border-bottom: 2px solid transparent;
+      border-radius: 0;
+      color: #555555;
+      font-size: 0.78rem;
+      font-weight: 500;
+      transition: color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+      background: transparent;
+    }
+
+    .scroll-progress,
+    .back-to-top { display: none !important; }
+
+    .hero {
+      width: min(1180px, calc(100% - 40px));
+      margin: 28px auto 0;
+      overflow: hidden;
+      padding: 0 0 42px;
+      border-bottom: 0;
+      border-radius: 4px;
+      background: #ffffff;
+    }
+
+    .hero::after,
+    .eyebrow { display: none; }
+
+    .hero-visual {
+      position: relative;
+      display: grid;
+      min-height: 510px;
+      overflow: hidden;
+      place-items: center;
+      background: #222222;
+    }
+
+    .hero-collage {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-rows: repeat(2, minmax(0, 1fr));
+      gap: 2px;
+    }
+
+    .hero-collage::after {
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 17, 24, 0.58);
+      content: "";
+    }
+
+    .hero-collage img {
+      width: 100%;
+      height: 100%;
+      min-width: 0;
+      object-fit: cover;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 1040px;
+      padding: 42px 20px;
+    }
+
+    h1 {
+      max-width: 930px;
+      color: #ffffff;
+      font-family: "Noto Sans", Arial, sans-serif;
+      font-size: 2.55rem;
+      font-weight: 600;
+      line-height: 1.23;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+    }
+
+    .title-mark { color: inherit; }
+
+    .subtitle {
+      margin: 20px 0 6px;
+      color: rgba(255, 255, 255, 0.92);
+      font-size: 1.02rem;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+    }
+
+    .authors {
+      color: #ffffff;
+      font-weight: 500;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+    }
+
+    .hero-actions {
+      gap: 8px;
+      margin: 23px 0 32px;
+    }
+
+    .action-button,
+    .action-button.primary {
+      min-height: 36px;
+      padding: 6px 13px;
+      border: 1px solid rgba(255, 255, 255, 0.78);
+      border-radius: 3px;
+      color: #ffffff;
+      background: rgba(25, 25, 25, 0.84);
+      font-size: 0.86rem;
+      font-weight: 500;
+      transition: background 0.15s ease;
+    }
+
+    .action-button:hover {
+      background: #111111;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .button-icon { width: 15px; height: 15px; }
+
+    .abstract {
+      max-width: 920px;
+      margin: 38px auto 0;
+      padding: 28px 0 0;
+      border-top: 1px solid #dddddd;
+      border-left: 0;
+      color: #333333;
+      background: transparent;
+      box-shadow: none;
+      text-align: justify;
+    }
+
+    main section,
+    main section:nth-of-type(even) {
+      padding: 48px 0;
+      border: 0;
+      border-top: 1px solid #eeeeee;
+      background: #ffffff;
+    }
+
+    .section-heading {
+      margin: 0 0 28px;
+      padding: 0;
+      border: 0;
+      font-family: "Noto Sans", Arial, sans-serif;
+      font-size: 1.75rem;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .section-intro {
+      max-width: none;
+      margin: 0 0 25px;
+      color: #333333;
+      font-size: 1rem;
+      text-align: justify;
+    }
+
+    .subheading {
+      margin: 34px 0 15px;
+      font-family: "Noto Sans", Arial, sans-serif;
+      font-size: 1.24rem;
+      font-weight: 600;
+    }
+
+    .highlights-grid {
+      counter-reset: contribution;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+    }
+
+    .highlight-card {
+      position: relative;
+      padding: 17px 0 0 38px;
+      border: 0;
+      border-top: 1px solid #cfcfcf;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      counter-increment: contribution;
+    }
+
+    .highlight-card::before {
+      position: absolute;
+      top: 13px;
+      left: 0;
+      color: var(--primary);
+      content: counter(contribution, decimal-leading-zero);
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    .highlight-icon { display: none; }
+    .highlight-card h3 { margin: 0 0 6px; font-size: 1rem; font-weight: 600; }
+    .highlight-card p { color: #555555; font-size: 0.93rem; }
+
+    .protocol-flow {
+      grid-template-columns: 1fr 52px 1fr 52px 1fr;
+      margin: 27px 0 32px;
+      padding: 0;
+      border: 1px solid #d8d8d8;
+      background: #ffffff;
+    }
+
+    .flow-step {
+      min-height: 96px;
+      padding: 18px;
+      border: 0;
+      background: #ffffff;
+      box-shadow: none;
+      text-align: center;
+    }
+
+    .flow-step strong { font-size: 0.94rem; font-weight: 600; }
+    .flow-step span { color: #666666; font-size: 0.84rem; }
+    .flow-arrow { background: #aaaaaa; }
+    .flow-arrow::after { border-color: #888888; }
+
+    .conflict-grid { gap: 20px; }
+
+    .conflict-card {
+      border: 1px solid #d8d8d8;
+      border-radius: 0;
+      background: #ffffff;
+      box-shadow: none;
+    }
+
+    .conflict-card h3 {
+      margin: 0;
+      padding: 12px 16px;
+      border-bottom: 1px solid #dddddd;
+      color: #333333;
+      background: #f6f6f6;
+      font-size: 0.98rem;
+    }
+
+    .conflict-card p { padding: 14px 16px 16px; color: #555555; font-size: 0.93rem; }
+
+    .table-wrap {
+      border: 1px solid #d9d9d9;
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    table { font-size: 0.88rem; }
+
+    th, td {
+      padding: 10px 12px;
+      border-right: 1px solid #e6e6e6;
+      border-bottom: 1px solid #dddddd;
+    }
+
+    th:last-child,
+    td:last-child { border-right: 0; }
+
+    th {
+      color: #222222;
+      background: #f0f0f0;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-transform: none;
+    }
+
+    tbody tr:nth-child(even) { background: #fafafa; }
+    tbody tr:hover { background: #f5f8fc; }
+    .warning-col { background: var(--orange-50); }
+    th.warning-col { color: #4b4030; background: var(--orange-200); }
+    tbody tr:hover .warning-col { background: #fff3d9; }
+    .ours-row,
+    .ours-row:nth-child(even),
+    .ours-row:hover { background: var(--blue-100); }
+
+    .results-box {
+      grid-template-columns: 185px 1fr;
+      margin-top: 28px;
+      border: 1px solid #d8d8d8;
+      border-left: 3px solid var(--primary);
+      background: #ffffff;
+    }
+
+    .results-label {
+      padding: 17px 18px;
+      border-right: 1px solid #dddddd;
+      color: #222222;
+      background: #f7f7f7;
+    }
+
+    .results-label strong { font-size: 1rem; }
+    .results-label span { color: #777777; font-size: 0.8rem; }
+    .results-list { padding: 14px 22px; font-size: 0.9rem; }
+
+    .dataset-meta {
+      gap: 0;
+      margin-bottom: 24px;
+      color: #666666;
+      font-size: 0.88rem;
+    }
+
+    .dataset-meta li {
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      color: #666666;
+      background: transparent;
+      font-size: inherit;
+      font-weight: 400;
+    }
+
+    .dataset-meta li:not(:last-child)::after {
+      margin: 0 10px;
+      color: #aaaaaa;
+      content: "\00b7";
+    }
+
+    .image-grid { gap: 14px; }
+
+    .image-card {
+      margin: 0;
+      overflow: visible;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      aspect-ratio: auto;
+    }
+
+    .dataset-image-link {
+      display: block;
+      overflow: hidden;
+      border: 1px solid #d2d2d2;
+      border-radius: 2px;
+      background: #e4e4e4;
+      aspect-ratio: 3 / 2;
+    }
+
+    .image-card::before { display: none; }
+
+    .image-card img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .image-card figcaption {
+      margin-top: 7px;
+      color: #555555;
+      font-size: 0.84rem;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .results-figure {
+      margin: 30px 0 0;
+    }
+
+    .results-figure-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 12px;
+    }
+
+    .results-figure-header h3 {
+      margin: 0;
+      font-size: 1.08rem;
+      font-weight: 600;
+    }
+
+    .result-pdf-link {
+      flex: 0 0 auto;
+      font-size: 0.86rem;
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .result-pdf-link:hover { text-decoration: underline; }
+
+    .results-preview-scroll {
+      overflow-x: auto;
+      border: 1px solid #d8d8d8;
+      background: #ffffff;
+    }
+
+    .results-preview-link {
+      display: block;
+      width: 100%;
+      min-width: 760px;
+      cursor: zoom-in;
+    }
+
+    .results-preview {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .results-caption {
+      margin: 9px 0 0;
+      color: #666666;
+      font-size: 0.82rem;
+      text-align: center;
+    }
+
+    .datasets-list {
+      margin-top: 34px;
+      border-top: 1px solid #d8d8d8;
+    }
+
+    .datasets-list .dataset-section {
+      padding: 42px 0;
+      border-bottom: 1px solid #d8d8d8;
+    }
+
+    .datasets-list .dataset-section:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .dataset-heading {
+      margin: 0 0 14px;
+      color: #222222;
+      font-size: 1.35rem;
+      font-weight: 600;
+    }
+
+    .toolbox-figure-placeholder {
+      display: grid;
+      place-items: center;
+      width: 100%;
+      margin: 28px 0 34px;
+      border: 1px solid #cfcfcf;
+      background: #eeeeee;
+      aspect-ratio: 16 / 7;
+      color: #777777;
+      font-size: 0.92rem;
+    }
+
+    .benchmark-results {
+      margin-top: 38px;
+    }
+
+    .benchmark-results .results-figure {
+      margin-top: 44px;
+      padding-top: 38px;
+      border-top: 1px solid #d8d8d8;
+    }
+
+    .benchmark-results .results-figure:first-child {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: 0;
+    }
+
+    details.results-details {
+      margin-top: 22px;
+      border: 1px solid #d8d8d8;
+      border-radius: 0;
+    }
+
+    details.results-details summary { padding: 12px 14px; font-size: 0.92rem; font-weight: 600; }
+    .details-content { padding: 0 14px 14px; }
+
+    .shot-tabs {
+      gap: 22px;
+      width: 100%;
+      margin-bottom: 14px;
+      padding: 0;
+      border: 0;
+      border-bottom: 1px solid #dddddd;
+      border-radius: 0;
+      background: transparent;
+    }
+
+    .tab-button {
+      min-width: auto;
+      margin-bottom: -1px;
+      padding: 9px 2px 8px;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      border-radius: 0;
+      color: #777777;
+      background: transparent;
+      font-size: 0.84rem;
+      font-weight: 500;
+    }
+
+    .tab-button:hover { color: var(--primary); }
+    .tab-button.active { color: var(--primary); border-bottom-color: var(--primary); background: transparent; }
+    .empty-results { background: #fafafa; }
+    .table-note { font-size: 0.82rem; }
+
+    .toolbox-banner { grid-template-columns: 1fr 0.72fr; gap: 32px; }
+    .feature-list li::before { color: var(--primary); background: transparent; font-size: 0.9rem; }
+
+    .acknowledgement {
+      padding: 18px 20px;
+      border: 1px solid #d8d8d8;
+      border-left: 3px solid var(--primary);
+      background: #f8f8f8;
+    }
+
+    .citations { gap: 14px; }
+    .citation-card { border-radius: 0; }
+    .citation-header { min-height: 42px; background: #333333; }
+    .copy-button { border-radius: 2px; background: #444444; }
+    pre { font-size: 0.8rem; }
+
+    footer {
+      padding: 26px 0;
+      border-top: 1px solid #dddddd;
+      color: #777777;
+      background: #ffffff;
+      font-size: 0.84rem;
+    }
+
+    footer .institution { color: #444444; font-weight: 500; }
+
+    @media (max-width: 900px) {
+      :root { --nav-height: 52px; }
+      .container { width: min(1000px, calc(100% - 32px)); }
+      .nav-links {
+        top: var(--nav-height);
+        padding: 8px 16px 14px;
+        border-bottom: 1px solid #dddddd;
+        box-shadow: none;
+      }
+      .nav-links a { padding: 10px 8px; border-bottom: 0; }
+      .nav-links a.active { background: #f5f5f5; }
+      .hero {
+        width: min(100% - 24px, 1180px);
+        margin-top: 16px;
+        padding-bottom: 36px;
+      }
+      .hero-visual { min-height: 470px; }
+      h1 { font-size: 2.05rem; }
+      .toolbox-banner { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 680px) {
+      body { font-size: 15px; }
+      main section,
+      main section:nth-of-type(even) { padding: 40px 0; }
+      .hero {
+        width: 100%;
+        margin-top: 0;
+        border-radius: 0;
+      }
+      .hero-visual { min-height: 515px; }
+      .hero-collage {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: repeat(3, minmax(0, 1fr));
+      }
+      .hero-collage::after { background: rgba(10, 17, 24, 0.64); }
+      .hero-content { padding: 35px 16px; }
+      h1 { font-size: 1.76rem; line-height: 1.3; }
+      .abstract,
+      .section-intro { text-align: left; }
+      .section-heading { font-size: 1.5rem; }
+      .highlights-grid { grid-template-columns: 1fr; gap: 20px; }
+      .protocol-flow { grid-template-columns: 1fr; gap: 0; }
+      .flow-step { min-height: 0; }
+      .flow-arrow { width: 1px; height: 22px; margin: 0 auto; }
+      .flow-arrow::after { top: auto; right: -4px; bottom: 0; transform: rotate(135deg); }
+      .conflict-grid,
+      .image-grid { grid-template-columns: 1fr; }
+      .results-box { grid-template-columns: 1fr; }
+      .results-label { border-right: 0; border-bottom: 1px solid #dddddd; }
+      .results-list { grid-template-columns: 1fr; }
+      .datasets-list .dataset-section { padding: 34px 0; }
+      .dataset-meta { display: block; }
+      .dataset-meta li { margin: 3px 0; }
+      .dataset-meta li:not(:last-child)::after { display: none; }
+      .shot-tabs { display: flex; width: 100%; gap: 18px; }
+      .results-figure-header { align-items: center; }
+    }
+
+    /* STAR-inspired academic project-page treatment. */
+    :root {
+      --primary: #4682b4;
+      --primary-dark: #2b5068;
+      --accent: #ff6700;
+      --blue-50: #f3f7fa;
+      --blue-100: #e8f0f6;
+      --ink: #333333;
+      --muted: #666666;
+      --line: #c9c3c4;
+      --surface: #f7f7f5;
+      --nav-height: 48px;
+    }
+
+    body {
+      color: #383838;
+      font-family: "Times New Roman", Times, serif;
+      font-size: 16px;
+      line-height: 1.56;
+      text-rendering: optimizeLegibility;
+    }
+
+    a { color: #ab9bab; }
+    a:hover { color: rgba(255, 103, 0, 0.8); }
+
+    .container { width: min(900px, calc(100% - 32px)); }
+
+    .site-nav {
+      height: var(--nav-height);
+      border-bottom: 1px solid #e8e8e8;
+      background: rgba(255, 255, 255, 0.98);
+    }
+
+    .nav-inner { max-width: 900px; }
+
+    .brand {
+      color: var(--primary);
+      font-family: inherit;
+      font-size: 0.98rem;
+      letter-spacing: 0;
+    }
+
+    .brand-mark { color: var(--primary); }
+
+    .nav-links a {
+      padding: 15px 7px 13px;
+      color: #666666;
+      font-size: 0.75rem;
+      font-weight: 400;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .hero {
+      width: min(900px, calc(100% - 32px));
+      margin-top: 22px;
+      padding-bottom: 24px;
+      border-radius: 0;
+    }
+
+    .hero-visual {
+      min-height: 370px;
+      border: 1px solid #dddddd;
+      background: #222222;
+    }
+
+    .hero-collage { gap: 1px; }
+    .hero-collage::after { background: rgba(12, 20, 27, 0.62); }
+    .hero-content { max-width: 850px; padding: 34px 30px; }
+
+    h1 {
+      max-width: 800px;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 2rem;
+      font-weight: 600;
+      line-height: 1.28;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
+    }
+
+    .subtitle {
+      margin-top: 16px;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.94rem;
+    }
+
+    .authors { color: #ffffff; font-size: 0.92rem; }
+
+    .hero-actions { gap: 20px; margin: 18px 0 0; }
+
+    .action-button,
+    .action-button.primary {
+      min-height: auto;
+      padding: 2px 0;
+      border: 0;
+      color: #ffffff;
+      background: transparent;
+      font-size: 0.86rem;
+      font-weight: 600;
+    }
+
+    .action-button::before { content: "["; }
+    .action-button::after { content: "]"; }
+    .action-button .button-icon { display: none; }
+    .action-button:hover { color: #ffc58f; background: transparent; }
+
+    .abstract {
+      max-width: 860px;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top-color: #dddddd;
+      color: #383838;
+      font-size: 1rem;
+      line-height: 1.58;
+    }
+
+    main section,
+    main section:nth-of-type(even) {
+      padding: 30px 0;
+      border-top: 0;
+      background: #ffffff;
+    }
+
+    main section + section .container {
+      padding-top: 28px;
+      border-top: 1px solid #eeeeee;
+    }
+
+    .section-heading {
+      margin: 0 0 14px;
+      color: var(--primary);
+      font-family: inherit;
+      font-size: 1.22rem;
+      font-weight: 700;
+      line-height: 1.5;
+      text-align: left;
+    }
+
+    #highlights .section-heading::before {
+      margin-right: 7px;
+      color: #e2b327;
+      content: "★";
+      font-size: 0.85em;
+    }
+
+    .section-intro {
+      margin-bottom: 18px;
+      color: #383838;
+      font-size: 1rem;
+      line-height: 1.58;
+      text-align: justify;
+    }
+
+    .subheading {
+      margin: 25px 0 10px;
+      color: var(--primary);
+      font-family: inherit;
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .highlights-grid {
+      display: block;
+      margin-top: 2px;
+    }
+
+    .highlight-card {
+      min-height: 0;
+      margin: 0 0 7px;
+      padding: 0 0 0 17px;
+      border: 0;
+    }
+
+    .highlight-card::before {
+      top: 2px;
+      left: 0;
+      color: #d5aa22;
+      content: "•";
+      font-size: 1.15rem;
+      line-height: 1;
+    }
+
+    .highlight-card h3 {
+      display: inline;
+      margin-right: 6px;
+      color: #444444;
+      font-size: 0.94rem;
+      font-weight: 700;
+    }
+
+    .highlight-card p {
+      display: inline;
+      color: #484848;
+      font-size: 0.96rem;
+      line-height: 1.55;
+    }
+
+    .protocol-flow {
+      margin: 20px 0 24px;
+      border-color: var(--line);
+    }
+
+    .flow-step { min-height: 80px; padding: 14px 12px; }
+    .flow-step strong { color: var(--primary-dark); font-size: 0.88rem; }
+    .flow-step span { font-size: 0.78rem; }
+
+    .conflict-card { border-color: var(--line); }
+    .conflict-card h3 {
+      padding: 9px 13px;
+      color: var(--primary-dark);
+      background: #f4f5f3;
+      font-size: 0.9rem;
+    }
+    .conflict-card p {
+      padding: 11px 13px 13px;
+      color: #3f3f3f;
+      font-size: 0.94rem;
+      line-height: 1.52;
+    }
+
+    .table-wrap,
+    .results-preview-scroll { border-color: var(--line); }
+
+    th {
+      color: var(--primary-dark);
+      background: #f1f1ef;
+      font-size: 0.77rem;
+    }
+
+    th, td { padding: 8px 9px; }
+    table { font-size: 0.86rem; }
+
+    .results-box {
+      margin-top: 22px;
+      border-color: var(--line);
+      border-left: 0;
+    }
+
+    .results-label { padding: 13px 15px; background: #f4f5f3; }
+    .results-list { padding: 11px 18px; color: #3f3f3f; font-size: 0.9rem; }
+
+    .datasets-list { margin-top: 24px; border-top-color: var(--line); }
+    .datasets-list .dataset-section { padding: 31px 0; border-bottom-color: #dddddd; }
+
+    .dataset-heading {
+      margin-bottom: 9px;
+      color: var(--primary);
+      font-size: 1.12rem;
+    }
+
+    .dataset-meta {
+      margin-bottom: 17px;
+      color: #4a4a4a;
+      font-size: 0.86rem;
+      line-height: 1.5;
+    }
+    .image-grid { gap: 10px; }
+    .dataset-image-link { border-color: var(--line); border-radius: 0; }
+    .image-card figcaption { margin-top: 4px; font-size: 0.76rem; }
+
+    .toolbox-figure-placeholder {
+      margin: 18px 0 24px;
+      border-color: var(--line);
+      color: #888888;
+      background: #f5f5f3;
+      font-size: 0.82rem;
+    }
+
+    .toolbox-figure-placeholder.pdf-figure {
+      display: block;
+      aspect-ratio: auto;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    .toolbox-figure-placeholder.pdf-figure a,
+    .toolbox-figure-placeholder.pdf-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .pdf-overview-figure {
+      margin: 18px 0 0;
+    }
+
+    .pdf-overview-figure a {
+      display: block;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: #ffffff;
+    }
+
+    .pdf-overview-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .pdf-overview-figure figcaption {
+      margin-top: 8px;
+      color: #777777;
+      font-size: 0.78rem;
+      text-align: center;
+    }
+
+    .pdf-overview-figure figcaption a { display: inline; border: 0; color: var(--primary); }
+
+    .toolbox-banner { gap: 24px; }
+    .feature-list { margin: 17px 0; }
+    .feature-list li { margin-bottom: 6px; color: #3f3f3f; font-size: 0.95rem; }
+
+    .benchmark-results { margin-top: 28px; }
+    .benchmark-results .results-figure {
+      margin-top: 34px;
+      padding-top: 27px;
+      border-top-color: #dddddd;
+    }
+
+    .results-figure-header h3 { color: var(--primary); font-size: 1rem; }
+    .result-pdf-link { color: #ab9bab; font-size: 0.8rem; }
+    .results-caption { color: #777777; font-size: 0.76rem; }
+
+    .acknowledgement {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 0;
+      color: #383838;
+      background: #f7f7f5;
+      font-size: 0.98rem;
+      line-height: 1.56;
+    }
+
+    .citations { gap: 12px; }
+    .citation-card {
+      border: 1px solid var(--line);
+      color: #333333;
+      background: #ffffff;
+    }
+
+    .citation-header {
+      min-height: 36px;
+      padding: 7px 11px;
+      color: var(--primary-dark);
+      background: #f1f1ef;
+    }
+
+    .citation-header strong { font-size: 0.84rem; }
+
+    .copy-button {
+      padding: 4px 7px;
+      border: 1px solid #c9c3c4;
+      color: #666666;
+      background: #ffffff;
+      font-size: 0.72rem;
+    }
+
+    .copy-button:hover { color: #ffffff; background: var(--primary); }
+
+    pre {
+      margin: 0;
+      padding: 11px 13px 13px;
+      color: #555555;
+      background: #ffffff;
+      font-family: Monaco, "Andale Mono", "Courier New", monospace;
+      font-size: 0.7rem;
+      line-height: 1.42;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      overflow-x: hidden;
+    }
+
+    .citation-card pre,
+    .citation-card code {
+      display: block;
+      color: #333333;
+      background: transparent;
+      -webkit-text-fill-color: #333333;
+    }
+
+    .related-citation-card { overflow: hidden; }
+
+    .citation-entry + .citation-entry { border-top: 1px solid var(--line); }
+
+    .citation-entry-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 36px;
+      padding: 7px 11px;
+      color: var(--primary-dark);
+      background: #f1f1ef;
+    }
+
+    .citation-entry-header strong { font-size: 0.84rem; }
+
+    footer {
+      padding: 18px 0;
+      border-top-color: #dddddd;
+      color: #888888;
+      background: #ffffff;
+      font-size: 0.76rem;
+    }
+
+    footer .institution { color: var(--primary); font-weight: 600; }
+
+    @media (max-width: 900px) {
+      .container { width: min(900px, calc(100% - 28px)); }
+      .hero { width: min(900px, calc(100% - 20px)); margin-top: 10px; }
+      .hero-visual { min-height: 330px; }
+      h1 { font-size: 1.65rem; }
+      .protocol-flow { grid-template-columns: 1fr; gap: 0; }
+      .flow-arrow { width: 1px; height: 22px; margin: 0 auto; }
+      .flow-arrow::after { top: auto; right: -4px; bottom: 0; transform: rotate(135deg); }
+    }
+
+    @media (max-width: 680px) {
+      body { font-size: 15.5px; }
+      .hero { width: 100%; margin-top: 0; }
+      .hero-visual { min-height: 410px; }
+      .hero-content { padding: 28px 16px; }
+      h1 { font-size: 1.52rem; line-height: 1.28; }
+      .subtitle { font-size: 0.87rem; }
+      .hero-actions { gap: 16px; }
+      .abstract { margin-top: 18px; padding-top: 16px; text-align: left; }
+      main section,
+      main section:nth-of-type(even) { padding: 23px 0; }
+      main section + section .container { padding-top: 22px; }
+      .section-heading { font-size: 1.12rem; }
+      .section-intro { text-align: left; }
+      .highlights-grid { display: block; }
+      .image-grid { grid-template-columns: 1fr; gap: 16px; }
+      .datasets-list .dataset-section { padding: 25px 0; }
+      .results-preview-link { min-width: 760px; }
+      .citation-header { align-items: center; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#overview">Skip to content</a>
+
+  <nav class="site-nav" aria-label="Primary navigation">
+    <div class="container nav-inner">
+      <a class="brand" href="#overview"><span class="brand-mark">OBB</span>-Few</a>
+      <button class="menu-button" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="nav-links">
+        <span class="menu-lines" aria-hidden="true"></span>
+      </button>
+      <div class="nav-links" id="nav-links">
+        <a href="#overview">Overview</a>
+        <a href="#datasets">Datasets</a>
+        <a href="#toolbox">Toolbox</a>
+        <a href="#benchmark">Benchmark</a>
+        <a href="#citation">Citation</a>
+        <a href="#acknowledgement">Acknowledgement</a>
+      </div>
+    </div>
+    <div class="scroll-progress" aria-hidden="true"></div>
+  </nav>
+
+  <header class="hero" id="overview">
+    <div class="hero-visual">
+      <div class="hero-collage" aria-hidden="true">
+        <img src="assets/hero/dota.webp" alt="" fetchpriority="high">
+        <img src="assets/hero/rsar.webp" alt="">
+        <img src="assets/hero/dronevehicle.webp" alt="">
+        <img src="assets/hero/fgsrcs.webp" alt="">
+        <img src="assets/hero/dior.webp" alt="">
+        <img src="assets/hero/star.webp" alt="">
+      </div>
+      <div class="container hero-content">
+        <h1><span class="title-mark">OBB-Few:</span> A Comprehensive Benchmark for Few-Shot Oriented Object Detection in Real-World Remote Sensing Scenarios</h1>
+        <p class="subtitle">IEEE Transactions on Pattern Analysis and Machine Intelligence (Under Review)</p>
+        <p class="authors">Anonymous Authors</p>
+        <div class="hero-actions" aria-label="Project resources">
+          <a class="action-button primary" href="#" aria-label="Read the paper">
+            <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h9l4 4v16H6z"/><path d="M14 2v5h5M9 12h6M9 16h6"/></svg>
+            Paper
+          </a>
+          <a class="action-button" href="#" aria-label="Open GitHub repository">
+            <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 22v-3.9c.04-1-.35-1.96-1.1-2.64 3.6-.4 7.4-1.77 7.4-8A6.24 6.24 0 0 0 19.64 3c.26-.82.26-1.7 0-2.5 0 0-1.04-.34-3.64 1.66a12.7 12.7 0 0 0-6.55 0C6.85.16 5.8.5 5.8.5a6.2 6.2 0 0 0 0 2.5 6.25 6.25 0 0 0-1.65 4.48c0 6.22 3.78 7.59 7.38 8-.74.67-1.13 1.61-1.1 2.61V22"/><path d="M10.4 19c-3.4 1.05-3.4-1.7-4.75-2.05"/></svg>
+            GitHub
+          </a>
+          <a class="action-button" href="#datasets" aria-label="View benchmark datasets">
+            <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>
+            Dataset
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <p class="abstract"><strong>Abstract.</strong> Few-shot oriented object detection (FSOOD) aims to adapt remote-sensing detectors to emerging geospatial categories from only a few rotated-box annotations. Existing protocols usually sample base-training and novel-support images from the same collections, allowing repeated geographic context to leak across stages. We introduce OBB-Few, a deployment-oriented protocol and benchmark suite that enforces cross-stage scene isolation on six datasets spanning optical, infrared, SAR, large-scale satellite, UAV, and fine-grained ship scenarios.</p>
+    </div>
+  </header>
+
+  <main>
+    <section id="highlights" aria-labelledby="highlights-title">
+      <div class="container">
+        <h2 class="section-heading" id="highlights-title">Highlights</h2>
+        <div class="highlights-grid">
+          <article class="highlight-card">
+            <span class="highlight-icon" aria-hidden="true">
+              <svg class="button-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2.2 4.8-4.8 2.2 2.2-4.8z"/></svg>
+            </span>
+            <h3>Scene Isolation Protocol</h3>
+            <p>Cross-stage scene isolation via perceptual-hash filtering across six datasets.</p>
+          </article>
+          <article class="highlight-card">
+            <span class="highlight-icon" aria-hidden="true">
+              <svg class="button-icon" viewBox="0 0 24 24"><path d="M4 19V8M10 19V4M16 19v-7M22 19H2"/></svg>
+            </span>
+            <h3>IAO Conflict Analysis</h3>
+            <p>Formal identification of cross-stage and intra-stage incomplete-annotation conflicts.</p>
+          </article>
+          <article class="highlight-card">
+            <span class="highlight-icon" aria-hidden="true">
+              <svg class="button-icon" viewBox="0 0 24 24"><path d="m4 14 6-6 4 4 6-6M20 6v5M20 6h-5"/></svg>
+            </span>
+            <h3>SCL Method</h3>
+            <p>Class-adaptive dynamic masking with two-stage decoupled classification.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="protocol" aria-labelledby="protocol-title">
+      <div class="container">
+        <h2 class="section-heading" id="protocol-title">OBB-Few Benchmark Protocol</h2>
+        <p class="section-intro">OBB-Few enforces cross-stage scene isolation between base-training and fine-tuning stages. Unlike conventional protocols that draw images from the same collection, OBB-Few requires that no context-equivalent observations appear across stages. This is enforced via file-level exclusion and perceptual-hash (pHash) filtering with Hamming distance threshold <strong>&tau; = 10</strong>.</p>
+
+        <div class="protocol-flow" aria-label="OBB-Few benchmark construction flow">
+          <div class="flow-step"><strong>Base Training Pool</strong><span>Source images with base-class annotations</span></div>
+          <span class="flow-arrow" aria-hidden="true"></span>
+          <div class="flow-step"><strong>Scene Isolation</strong><span>File exclusion + pHash distance filtering</span></div>
+          <span class="flow-arrow" aria-hidden="true"></span>
+          <div class="flow-step"><strong>Novel Support Pool</strong><span>Scene-disjoint K-shot adaptation samples</span></div>
+        </div>
+
+        <h3 class="subheading">Incomplete Annotation of Objects (IAO)</h3>
+        <div class="conflict-grid">
+          <article class="conflict-card">
+            <h3>CS-IAO (Cross-Stage)</h3>
+            <p>During base training, novel-class objects are unlabeled and optimized as background, creating a “novel-as-background” prior before fine-tuning begins.</p>
+          </article>
+          <article class="conflict-card">
+            <h3>IS-IAO (Intra-Stage)</h3>
+            <p>During few-shot adaptation, annotated and hidden foreground objects coexist in the same support image, receiving contradictory foreground/background supervision.</p>
+          </article>
+        </div>
+
+        <h3 class="subheading">OBB-Few Dataset Benchmark Overview</h3>
+        <figure class="pdf-overview-figure">
+          <a href="images_pdf/benchmark.pdf" target="_blank" rel="noopener">
+            <img src="assets/figures/obb-few-benchmark.webp" alt="OBB-Few benchmark overview with dataset statistics and protocol settings" loading="lazy">
+          </a>
+          <figcaption>Dataset statistics and benchmark protocol overview. <a href="images_pdf/benchmark.pdf" target="_blank" rel="noopener">Open the original PDF</a>.</figcaption>
+        </figure>
+
+      </div>
+    </section>
+
+    <section id="datasets" aria-labelledby="datasets-title">
+      <div class="container">
+        <h2 class="section-heading" id="datasets-title">Datasets</h2>
+        <p class="section-intro">OBB-Few comprises six reconstructed remote-sensing datasets across optical aerial imagery, satellite imagery, synthetic aperture radar, infrared UAV sensing, and fine-grained ship recognition. Each dataset follows the same scene-isolated few-shot protocol.</p>
+        <div class="datasets-list">
+      <article class="dataset-section" id="dota" aria-labelledby="dota-title">
+        <h3 class="dataset-heading" id="dota-title">AeroOpt-Few</h3>
+        <p class="section-intro">AeroOpt-Few is reconstructed from DOTA, a large-scale optical aerial detection dataset. It contains 15 categories split into 10 base classes and 5 novel classes under three independent novel splits. AeroOpt-Few features dense small objects, cluttered backgrounds, and arbitrary object orientations typical of aerial surveillance scenarios.</p>
+        <ul class="dataset-meta"><li>Source: DOTA (CVPR 2018)</li><li>Modality: Optical Aerial</li><li>Image Size: 1024 &times; 1024 (cropped patches)</li><li>Novel Splits: 3 independent splits</li></ul>
+        <div class="image-grid" aria-label="AeroOpt-Few dataset images">
+          <figure class="image-card"><a class="dataset-image-link" href="dataset_images/dota/train/P1392__1024__2472___3004.png" target="_blank" rel="noopener"><img src="dataset_images/dota/train/P1392__1024__2472___3004.png" alt="AeroOpt-Few training image with aircraft on an airfield" loading="lazy"></a><figcaption>Train</figcaption></figure>
+          <figure class="image-card"><a class="dataset-image-link" href="dataset_images/dota/val/P0007__1024__466___824.png" target="_blank" rel="noopener"><img src="dataset_images/dota/val/P0007__1024__466___824.png" alt="AeroOpt-Few validation image with densely parked trucks" loading="lazy"></a><figcaption>Val</figcaption></figure>
+          <figure class="image-card"><a class="dataset-image-link" href="dataset_images/dota/val/P0019__1024__1648___2472.png" target="_blank" rel="noopener"><img src="dataset_images/dota/val/P0019__1024__1648___2472.png" alt="AeroOpt-Few test example from the validation folder" loading="lazy"></a><figcaption>Test</figcaption></figure>
+        </div>
+      </article>
+
+      <article class="dataset-section" id="rsar" aria-labelledby="rsar-title">
+        <h3 class="dataset-heading" id="rsar-title">RotSAR-Few</h3>
+        <p class="section-intro">RotSAR-Few is reconstructed from the RSAR dataset for rotated SAR object detection. SAR imagery presents unique challenges including speckle noise, scattering center responses, and radar shadow effects that differ substantially from optical appearance. It contains 3 base classes and 3 novel classes.</p>
+        <ul class="dataset-meta"><li>Source: RSAR (CVPR 2025)</li><li>Modality: Synthetic Aperture Radar (SAR)</li><li>Challenge: Speckle noise, scattering artifacts, non-optical appearance</li></ul>
+        <div class="image-grid" aria-label="RotSAR-Few dataset images"><figure class="image-card"><a class="dataset-image-link" href="dataset_images/rsar/train/10966.jpg" target="_blank" rel="noopener"><img src="dataset_images/rsar/train/10966.jpg" alt="RotSAR-Few training SAR image showing aircraft" loading="lazy"></a><figcaption>Train</figcaption></figure><figure class="image-card"><a class="dataset-image-link" href="dataset_images/rsar/val/1152.jpg" target="_blank" rel="noopener"><img src="dataset_images/rsar/val/1152.jpg" alt="RotSAR-Few validation SAR image showing dense targets" loading="lazy"></a><figcaption>Val</figcaption></figure><figure class="image-card"><a class="dataset-image-link" href="dataset_images/rsar/val/55981.jpg" target="_blank" rel="noopener"><img src="dataset_images/rsar/val/55981.jpg" alt="RotSAR-Few test example from the validation folder showing sparse bright targets" loading="lazy"></a><figcaption>Test</figcaption></figure></div>
+      </article>
+
+      <article class="dataset-section" id="dronevehicle" aria-labelledby="dronevehicle-title">
+        <h3 class="dataset-heading" id="dronevehicle-title">UAVIR-Few</h3>
+        <p class="section-intro">UAVIR-Few is reconstructed from the DroneVehicle dataset for UAV-based RGB-infrared cross-modality vehicle detection. It provides infrared and RGB paired images with large-scale variation and thermal signatures. With 3 base classes and 2 novel classes, it evaluates few-shot adaptation under thermal imaging conditions.</p>
+        <ul class="dataset-meta"><li>Source: DroneVehicle (TCSVT 2022)</li><li>Modality: UAV Infrared + RGB</li><li>Challenge: Thermal signatures, compact vehicle shapes, large scale variation</li></ul>
+        <div class="image-grid" aria-label="UAVIR-Few dataset images"><figure class="image-card"><a class="dataset-image-link" href="dataset_images/droneVehicle/train/2525.jpg" target="_blank" rel="noopener"><img src="dataset_images/droneVehicle/train/2525.jpg" alt="UAVIR-Few training infrared image showing road vehicles" loading="lazy"></a><figcaption>Train</figcaption></figure><figure class="image-card"><a class="dataset-image-link" href="dataset_images/droneVehicle/val/121.jpg" target="_blank" rel="noopener"><img src="dataset_images/droneVehicle/val/121.jpg" alt="UAVIR-Few validation infrared image showing parked vehicles" loading="lazy"></a><figcaption>Val</figcaption></figure><figure class="image-card"><a class="dataset-image-link" href="dataset_images/droneVehicle/val/3087.jpg" target="_blank" rel="noopener"><img src="dataset_images/droneVehicle/val/3087.jpg" alt="UAVIR-Few test example from the validation folder showing vehicles at an intersection" loading="lazy"></a><figcaption>Test</figcaption></figure></div>
+      </article>
+
+      <article class="dataset-section" id="fgsrcs" aria-labelledby="fgsrcs-title">
+        <h3 class="dataset-heading" id="fgsrcs-title">FGShip-Few</h3>
+        <p class="section-intro">FGShip-Few is reconstructed from the Fine-Grained Ship Recognition in Complex Scenarios dataset. It focuses on visually subtle vessel categories including submarines, patrol vessels, oil tankers, and container ships. With 12 base classes and 5 novel classes, it tests fine-grained discrimination under limited support.</p>
+        <ul class="dataset-meta"><li>Source: FGSRCS (TGRS 2025)</li><li>Modality: Optical (Fine-grained Ship)</li><li>Challenge: Subtle inter-class differences, visually similar vessels</li></ul>
+        <div class="image-grid" aria-label="FGShip-Few dataset images"><figure class="image-card"><a class="dataset-image-link" href="dataset_images/fgsd/train/3057.jpg" target="_blank" rel="noopener"><img src="dataset_images/fgsd/train/3057.jpg" alt="FGShip-Few training image showing a large vessel in port" loading="lazy"></a><figcaption>Train</figcaption></figure><figure class="image-card"><a class="dataset-image-link" href="dataset_images/fgsd/val/2133.jpg" target="_blank" rel="noopener"><img src="dataset_images/fgsd/val/2133.jpg" alt="FGShip-Few validation image showing ships at a harbor" loading="lazy"></a><figcaption>Val</figcaption></figure><figure class="image-card"><a class="dataset-image-link" href="dataset_images/fgsd/val/4085.jpg" target="_blank" rel="noopener"><img src="dataset_images/fgsd/val/4085.jpg" alt="FGShip-Few test example from the validation folder showing ships partly covered by clouds" loading="lazy"></a><figcaption>Test</figcaption></figure></div>
+      </article>
+
+      <article class="dataset-section" id="dior" aria-labelledby="dior-title">
+        <h3 class="dataset-heading" id="dior-title">GeoInfra-Few</h3>
+        <p class="section-intro">GeoInfra-Few is reconstructed from DIOR-R, a diverse optical remote sensing dataset covering 20 object categories across heterogeneous land-cover scenes. It contains 15 base classes and 5 novel classes, testing category transfer under diverse optical conditions including airports, bridges, storage tanks, and baseball fields.</p>
+        <ul class="dataset-meta"><li>Source: DIOR-R (arXiv 2019)</li><li>Modality: Optical Satellite</li><li>Categories: 15 base + 5 novel</li></ul>
+        <div class="image-grid" aria-label="GeoInfra-Few dataset images"><figure class="image-card"><a class="dataset-image-link" href="dataset_images/dior/train/03570.jpg" target="_blank" rel="noopener"><img src="dataset_images/dior/train/03570.jpg" alt="GeoInfra-Few training image showing aircraft" loading="lazy"></a><figcaption>Train</figcaption></figure><figure class="image-card"><a class="dataset-image-link" href="dataset_images/dior/val/00060.jpg" target="_blank" rel="noopener"><img src="dataset_images/dior/val/00060.jpg" alt="GeoInfra-Few validation image showing ships" loading="lazy"></a><figcaption>Val</figcaption></figure><figure class="image-card"><a class="dataset-image-link" href="dataset_images/dior/val/00089.jpg" target="_blank" rel="noopener"><img src="dataset_images/dior/val/00089.jpg" alt="GeoInfra-Few test example from the validation folder showing an athletic field" loading="lazy"></a><figcaption>Test</figcaption></figure></div>
+      </article>
+
+      <article class="dataset-section" id="star" aria-labelledby="star-title">
+        <h3 class="dataset-heading" id="star-title">WideSat-Few</h3>
+        <p class="section-intro">WideSat-Few is reconstructed from the STAR large-scale satellite imagery benchmark for scene graph generation. It focuses on sparse and fine-grained geospatial targets across 27 base classes and 18 novel classes, making it the largest category-space dataset in OBB-Few. Absolute AP values are lower due to extreme category diversity and sparse target distribution.</p>
+        <ul class="dataset-meta"><li>Source: STAR (TPAMI 2024)</li><li>Modality: Large-scale Satellite (VHR)</li><li>Challenge: Sparse targets, 45 total categories, fine-grained geospatial objects</li></ul>
+        <div class="image-grid" aria-label="WideSat-Few dataset images"><figure class="image-card"><a class="dataset-image-link" href="dataset_images/star/train/0300__1024__5768___2472.png" target="_blank" rel="noopener"><img src="dataset_images/star/train/0300__1024__5768___2472.png" alt="WideSat-Few training image showing an airport terminal" loading="lazy"></a><figcaption>Train</figcaption></figure><figure class="image-card"><a class="dataset-image-link" href="dataset_images/star/train/0092__1024__1648___1792.png" target="_blank" rel="noopener"><img src="dataset_images/star/train/0092__1024__1648___1792.png" alt="WideSat-Few validation example sourced from the training folder showing a port" loading="lazy"></a><figcaption>Val <span>(train sample)</span></figcaption></figure><figure class="image-card"><a class="dataset-image-link" href="dataset_images/star/train/0339__1024__824___1648.png" target="_blank" rel="noopener"><img src="dataset_images/star/train/0339__1024__824___1648.png" alt="WideSat-Few test example sourced from the training folder showing a dense urban scene" loading="lazy"></a><figcaption>Test <span>(train sample)</span></figcaption></figure></div>
+      </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="toolbox" aria-labelledby="toolbox-title">
+      <div class="container">
+        <h2 class="section-heading" id="toolbox-title">MMRotate-Few: Unified Evaluation Toolkit</h2>
+        <div class="toolbox-figure-placeholder pdf-figure" role="img" aria-label="MMRotate-Few overview figure">
+          <a href="images_pdf/over_review.pdf" target="_blank" rel="noopener">
+            <img src="assets/figures/mmrotate-few-over-review.webp" alt="MMRotate-Few overview showing the unified oriented detection toolkit and supported methods" loading="lazy">
+          </a>
+        </div>
+        <div class="toolbox-banner">
+          <div>
+            <p class="section-intro">MMRotate-Few is a unified evaluation toolkit built on MMRotate and Oriented R-CNN. It ports 17 representative few-shot object detection methods to the rotated detection setting by standardizing detection heads, anchor generators, box coders, RoI assignment, rotated NMS, and evaluation scripts while preserving each method's original learning objective.</p>
+            <ul class="feature-list"><li>17 representative FSOD methods ported to oriented detection</li><li>Flexible backbone interfaces: ResNet-50/101, Swin-B, SkySense</li><li>Unified Oriented R-CNN pipeline with rotated NMS</li><li>Compatible with all 6 OBB-Few reconstructed datasets</li><li>Reproducible split files and evaluation scripts</li></ul>
+            <a class="action-button primary" href="#" aria-label="Open MMRotate-Few on GitHub"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 22v-3.9c.04-1-.35-1.96-1.1-2.64 3.6-.4 7.4-1.77 7.4-8A6.24 6.24 0 0 0 19.64 3c.26-.82.26-1.7 0-2.5 0 0-1.04-.34-3.64 1.66a12.7 12.7 0 0 0-6.55 0C6.85.16 5.8.5 5.8.5a6.2 6.2 0 0 0 0 2.5 6.25 6.25 0 0 0-1.65 4.48c0 6.22 3.78 7.59 7.38 8-.74.67-1.13 1.61-1.1 2.61V22"/></svg>MMRotate-Few GitHub</a>
+          </div>
+          <div class="table-wrap methods-table"><table><thead><tr><th>Method</th><th>Venue</th></tr></thead><tbody><tr><td>TFA</td><td>ICML 2020</td></tr><tr><td>BRL</td><td>ICASSP 2020</td></tr><tr><td>TRAML</td><td>CVPR 2020</td></tr><tr><td>DeFRCN</td><td>ICCV 2021</td></tr><tr><td>DCFS</td><td>NeurIPS 2022</td></tr><tr><td>MFDC</td><td>ECCV 2022</td></tr><tr><td>CFA</td><td>CVPR 2022W</td></tr><tr><td>ST-FSOD</td><td>TGRS 2023</td></tr><tr><td>G-FSDet</td><td>ISPRS 2023</td></tr><tr><td>DiGeo</td><td>CVPR 2023</td></tr><tr><td>UNP</td><td>TCSVT 2024</td></tr><tr><td>RP-FSOD</td><td>TCSV 2024</td></tr><tr><td>T-RCNN</td><td>TOMM 2024</td></tr><tr><td>SAE-FSDet</td><td>TGRS 2024</td></tr><tr><td>FOMC</td><td>TGRS 2025</td></tr><tr><td>BDKMR</td><td>JAS 2025</td></tr><tr><td>PoE</td><td>TPAMI 2026</td></tr></tbody></table></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="benchmark" aria-labelledby="benchmark-title">
+      <div class="container">
+        <h2 class="section-heading" id="benchmark-title">Benchmark</h2>
+        <p class="section-intro">Comparison results on all six OBB-Few reconstructed datasets across three novel splits and 5-, 10-, and 20-shot settings. Select any result preview to open the corresponding PDF.</p>
+
+        <div class="results-box">
+          <div class="results-label"><strong>Key Results</strong><span>SCL gains over the best baseline</span></div>
+          <ul class="results-list">
+            <li>AeroOpt-Few Split 1 (5-shot): <strong>+4.9 mAP</strong></li>
+            <li>RotSAR-Few Split 2 (5-shot): <strong>+7.8 mAP</strong></li>
+            <li>UAVIR-Few Split 2 (20-shot): <strong>+5.4 mAP</strong></li>
+            <li>FGShip-Few Split 3 (10-shot): <strong>+3.2 mAP</strong></li>
+          </ul>
+        </div>
+
+        <div class="benchmark-results">
+          <figure class="results-figure">
+            <div class="results-figure-header"><h3>AeroOpt-Few</h3><a class="result-pdf-link" href="exp_results_pdf/AeroOpt-Few.pdf" target="_blank" rel="noopener">[Open PDF]</a></div>
+            <div class="results-preview-scroll"><a class="results-preview-link" href="exp_results_pdf/AeroOpt-Few.pdf" target="_blank" rel="noopener"><img class="results-preview" src="assets/results/aeroopt.webp" alt="Complete AeroOpt-Few benchmark results across three novel splits and 5, 10, and 20-shot settings" loading="lazy"></a></div>
+            <figcaption class="results-caption">Results across all three novel splits and shot settings.</figcaption>
+          </figure>
+
+          <figure class="results-figure">
+            <div class="results-figure-header"><h3>RotSAR-Few</h3><a class="result-pdf-link" href="exp_results_pdf/RotSAR-Few.pdf" target="_blank" rel="noopener">[Open PDF]</a></div>
+            <div class="results-preview-scroll"><a class="results-preview-link" href="exp_results_pdf/RotSAR-Few.pdf" target="_blank" rel="noopener"><img class="results-preview" src="assets/results/rotsar.webp" alt="Complete RotSAR-Few benchmark results across three novel splits and 5, 10, and 20-shot settings" loading="lazy"></a></div>
+            <figcaption class="results-caption">Results across all three novel splits and shot settings.</figcaption>
+          </figure>
+
+          <figure class="results-figure">
+            <div class="results-figure-header"><h3>UAVIR-Few</h3><a class="result-pdf-link" href="exp_results_pdf/UAVIR-Few.pdf" target="_blank" rel="noopener">[Open PDF]</a></div>
+            <div class="results-preview-scroll"><a class="results-preview-link" href="exp_results_pdf/UAVIR-Few.pdf" target="_blank" rel="noopener"><img class="results-preview" src="assets/results/uavir.webp" alt="Complete UAVIR-Few benchmark results across three novel splits and 5, 10, and 20-shot settings" loading="lazy"></a></div>
+            <figcaption class="results-caption">Results across all three novel splits and shot settings.</figcaption>
+          </figure>
+
+          <figure class="results-figure">
+            <div class="results-figure-header"><h3>FGShip-Few</h3><a class="result-pdf-link" href="exp_results_pdf/FGShip-Few.pdf" target="_blank" rel="noopener">[Open PDF]</a></div>
+            <div class="results-preview-scroll"><a class="results-preview-link" href="exp_results_pdf/FGShip-Few.pdf" target="_blank" rel="noopener"><img class="results-preview" src="assets/results/fgship.webp" alt="Complete FGShip-Few benchmark results across three novel splits and 5, 10, and 20-shot settings" loading="lazy"></a></div>
+            <figcaption class="results-caption">Results across all three novel splits and shot settings.</figcaption>
+          </figure>
+
+          <figure class="results-figure">
+            <div class="results-figure-header"><h3>GeoInfra-Few</h3><a class="result-pdf-link" href="exp_results_pdf/GeoInfra-Few.pdf" target="_blank" rel="noopener">[Open PDF]</a></div>
+            <div class="results-preview-scroll"><a class="results-preview-link" href="exp_results_pdf/GeoInfra-Few.pdf" target="_blank" rel="noopener"><img class="results-preview" src="assets/results/geoinfra.webp" alt="Complete GeoInfra-Few benchmark results across three novel splits and 5, 10, and 20-shot settings" loading="lazy"></a></div>
+            <figcaption class="results-caption">Results across all three novel splits and shot settings.</figcaption>
+          </figure>
+
+          <figure class="results-figure">
+            <div class="results-figure-header"><h3>WideSat-Few</h3><a class="result-pdf-link" href="exp_results_pdf/WideSat-Few.pdf" target="_blank" rel="noopener">[Open PDF]</a></div>
+            <div class="results-preview-scroll"><a class="results-preview-link" href="exp_results_pdf/WideSat-Few.pdf" target="_blank" rel="noopener"><img class="results-preview" src="assets/results/widesat.webp" alt="Complete WideSat-Few benchmark results across three novel splits and 5, 10, and 20-shot settings" loading="lazy"></a></div>
+            <figcaption class="results-caption">Results across all three novel splits and shot settings. Bold and underline indicate the best and second-best results.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="citation" aria-labelledby="citation-title">
+      <div class="container">
+        <h2 class="section-heading" id="citation-title">Citation</h2>
+        <div class="citations">
+          <div class="citation-card"><div class="citation-header"><strong>OBB-Few (This Work)</strong><button class="copy-button" type="button" data-copy="cite-obb"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="1"/><path d="M16 8V4H4v12h4"/></svg><span>Copy</span></button></div><pre id="cite-obb"><code>@article{obbFew2025,
+  title={OBB-Few: A Comprehensive Benchmark for Few-Shot Oriented Object Detection in Real-World Remote Sensing Scenarios},
+  author={Anonymous Authors},
+  journal={IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  year={2025}
+}</code></pre></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="acknowledgement" aria-labelledby="acknowledgement-title">
+      <div class="container">
+        <h2 class="section-heading" id="acknowledgement-title">Acknowledgement</h2>
+        <div class="acknowledgement"><p>This work is supported by [funding information to be added]. The authors thank the contributors of MMRotate, MMDetection, and the open-source remote sensing community. The six benchmark datasets are built upon DOTA, DIOR, RSAR, FGSRCS, DroneVehicle, and STAR; we thank their respective authors for making these datasets publicly available.</p></div>
+        <h3 class="subheading">Related Toolboxes and Methods</h3>
+        <div class="citations">
+          <div class="citation-card related-citation-card">
+            <section class="citation-entry"><div class="citation-entry-header"><strong>MMRotate-Few</strong><button class="copy-button" type="button" data-copy="cite-mmrotate"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="1"/><path d="M16 8V4H4v12h4"/></svg><span>Copy</span></button></div><pre id="cite-mmrotate"><code>@misc{mmrotatefew2025,
+  title={MMRotate-Few: A Unified Evaluation Toolkit for Few-Shot Oriented Object Detection},
+  author={Anonymous Authors},
+  year={2025},
+  howpublished={\url{https://github.com/}}
+}</code></pre></section>
+            <section class="citation-entry"><div class="citation-entry-header"><strong>FOMC</strong><button class="copy-button" type="button" data-copy="cite-fomc"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="1"/><path d="M16 8V4H4v12h4"/></svg><span>Copy</span></button></div><pre id="cite-fomc"><code>@article{zhao2025fomc,
+  title={FsDAOD: Few-shot Domain Adaptation Object Detection for Heterogeneous SAR Image},
+  author={Zhao, S. and Kang, Y. and Yuan, H. and others},
+  journal={Science of Remote Sensing},
+  volume={11},
+  pages={100202},
+  year={2025}
+}</code></pre></section>
+            <section class="citation-entry"><div class="citation-entry-header"><strong>MM-FewShot</strong><button class="copy-button" type="button" data-copy="cite-mmfewshot"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="1"/><path d="M16 8V4H4v12h4"/></svg><span>Copy</span></button></div><pre id="cite-mmfewshot"><code>@misc{mmfewshot2021,
+  title={OpenMMLab Few Shot Learning Toolbox and Benchmark},
+  author={OpenMMLab},
+  year={2021},
+  howpublished={\url{https://github.com/open-mmlab/mmfewshot}}
+}</code></pre></section>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="container"><p class="institution">OBB-Few Research Project</p><p>&copy; 2025 OBB-Few Authors. All rights reserved.</p></div></footer>
+  <button class="back-to-top" type="button" aria-label="Back to top"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 6-6 6 6"/></svg></button>
+
+  <script>
+    (() => {
+      const menuButton = document.querySelector('.menu-button');
+      const navLinks = document.querySelector('.nav-links');
+      const progress = document.querySelector('.scroll-progress');
+      const backToTop = document.querySelector('.back-to-top');
+
+      const closeMenu = () => {
+        navLinks.classList.remove('open');
+        document.body.classList.remove('nav-open');
+        menuButton.setAttribute('aria-expanded', 'false');
+        menuButton.setAttribute('aria-label', 'Open navigation');
+      };
+
+      menuButton.addEventListener('click', () => {
+        const isOpen = navLinks.classList.toggle('open');
+        document.body.classList.toggle('nav-open', isOpen);
+        menuButton.setAttribute('aria-expanded', String(isOpen));
+        menuButton.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
+      });
+
+      navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
+
+      document.querySelectorAll('.shot-tabs').forEach(tabList => {
+        const buttons = [...tabList.querySelectorAll('.tab-button')];
+        buttons.forEach((button, buttonIndex) => {
+          const target = document.getElementById(button.dataset.tab);
+          button.setAttribute('aria-controls', target.id);
+          target.setAttribute('aria-labelledby', button.id || `${target.id}-tab`);
+          button.id = button.id || `${target.id}-tab`;
+          button.tabIndex = button.classList.contains('active') ? 0 : -1;
+
+          button.addEventListener('click', () => {
+            buttons.forEach(other => {
+              const isActive = other === button;
+              other.classList.toggle('active', isActive);
+              other.setAttribute('aria-selected', String(isActive));
+              other.tabIndex = isActive ? 0 : -1;
+              document.getElementById(other.dataset.tab).hidden = !isActive;
+            });
+          });
+
+          button.addEventListener('keydown', event => {
+            if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+            event.preventDefault();
+            const direction = event.key === 'ArrowRight' ? 1 : -1;
+            const next = buttons[(buttonIndex + direction + buttons.length) % buttons.length];
+            next.click();
+            next.focus();
+          });
+        });
+      });
+
+      document.querySelectorAll('.copy-button').forEach(button => {
+        button.addEventListener('click', async () => {
+          const source = document.getElementById(button.dataset.copy);
+          const label = button.querySelector('span');
+          const text = source.textContent.trim();
+          try {
+            await navigator.clipboard.writeText(text);
+          } catch (_) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            textarea.remove();
+          }
+          label.textContent = 'Copied';
+          button.setAttribute('aria-label', 'Citation copied');
+          window.setTimeout(() => {
+            label.textContent = 'Copy';
+            button.removeAttribute('aria-label');
+          }, 1600);
+        });
+      });
+
+      const sections = [...document.querySelectorAll('header[id], main section[id]')];
+      const links = [...navLinks.querySelectorAll('a')];
+      const sectionGroup = {
+        highlights: 'overview',
+        protocol: 'overview',
+        dota: 'datasets',
+        dior: 'datasets',
+        rsar: 'datasets',
+        fgsrcs: 'datasets',
+        dronevehicle: 'datasets',
+        star: 'datasets'
+      };
+      const updateScrollState = () => {
+        const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+        progress.style.transform = `scaleX(${scrollable > 0 ? window.scrollY / scrollable : 0})`;
+        backToTop.classList.toggle('visible', window.scrollY > 720);
+        const referenceY = Math.min(window.innerHeight * 0.45, 360);
+        const currentSection = sections.reduce((current, section) => {
+          return section.getBoundingClientRect().top <= referenceY ? section : current;
+        }, sections[0]);
+        const activeId = sectionGroup[currentSection.id] || currentSection.id;
+        links.forEach(link => link.classList.toggle('active', link.getAttribute('href') === `#${activeId}`));
+      };
+
+      window.addEventListener('scroll', updateScrollState, { passive: true });
+      window.addEventListener('resize', () => { if (window.innerWidth > 900) closeMenu(); });
+      backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+      updateScrollState();
+    })();
+  </script>
+</body>
+</html>
