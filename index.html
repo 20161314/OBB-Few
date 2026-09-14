@@ -1868,6 +1868,54 @@
       .results-preview-link { min-width: 760px; }
       .citation-header { align-items: center; }
     }
+
+    /* Readability pass: keep the STAR-inspired rhythm while giving long-form
+       benchmark text enough size and leading for comfortable reading. */
+    body {
+      font-size: 17px;
+      line-height: 1.64;
+    }
+
+    .nav-links a { font-size: 0.8rem; }
+    .subtitle { font-size: 0.98rem; }
+    .authors { font-size: 0.96rem; }
+    .abstract,
+    .section-intro { font-size: 1.06rem; line-height: 1.64; }
+    .section-heading { font-size: 1.3rem; }
+    .subheading { font-size: 1.1rem; }
+    .highlight-card h3 { font-size: 1rem; }
+    .highlight-card p { font-size: 1rem; line-height: 1.6; }
+    .flow-step strong { font-size: 0.94rem; }
+    .flow-step span { font-size: 0.84rem; line-height: 1.5; }
+    .conflict-card h3 { font-size: 1rem; }
+    .conflict-card p { font-size: 0.98rem; line-height: 1.6; }
+    table { font-size: 0.9rem; }
+    .results-label strong { font-size: 1.05rem; }
+    .results-label span,
+    .results-list { font-size: 0.94rem; }
+    .dataset-heading { font-size: 1.2rem; }
+    .dataset-meta { font-size: 0.92rem; line-height: 1.58; }
+    .image-card figcaption { font-size: 0.82rem; }
+    .results-figure-header h3 { font-size: 1.06rem; }
+    .result-pdf-link { font-size: 0.84rem; }
+    .results-caption { font-size: 0.82rem; }
+    .feature-list li { font-size: 1rem; }
+    .acknowledgement { font-size: 1.04rem; line-height: 1.62; }
+    .citation-header strong,
+    .citation-entry-header strong { font-size: 0.9rem; }
+    pre { font-size: 0.78rem; line-height: 1.5; }
+    footer { font-size: 0.82rem; }
+
+    @media (max-width: 680px) {
+      body { font-size: 16.5px; }
+      h1 { font-size: 1.6rem; }
+      .section-heading { font-size: 1.2rem; }
+      .abstract,
+      .section-intro { font-size: 1rem; line-height: 1.62; }
+      .dataset-heading { font-size: 1.16rem; }
+      .dataset-meta { font-size: 0.9rem; }
+      pre { font-size: 0.76rem; }
+    }
   </style>
 </head>
 <body>
