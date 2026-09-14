@@ -625,10 +625,7 @@
     .table-note { margin: 11px 0 0; color: var(--muted); font-size: 0.88rem; }
 
     .toolbox-banner {
-      display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 36px;
-      align-items: start;
+      display: block;
     }
 
     .feature-list { margin: 24px 0; padding: 0; list-style: none; }
@@ -656,6 +653,13 @@
     }
 
     .methods-table td:first-child { font-weight: 600; }
+
+    .methods-table-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+      margin-top: 26px;
+    }
 
     .acknowledgement {
       padding: 26px 30px;
@@ -773,7 +777,7 @@
       .flow-arrow::after { top: auto; right: -4px; bottom: 0; transform: rotate(135deg); }
       .results-box { grid-template-columns: 1fr; }
       .results-list { padding: 18px 20px; }
-      .toolbox-banner { grid-template-columns: 1fr; }
+      .toolbox-banner { display: block; }
     }
 
     @media (max-width: 680px) {
@@ -1343,7 +1347,7 @@
     .empty-results { background: #fafafa; }
     .table-note { font-size: 0.82rem; }
 
-    .toolbox-banner { grid-template-columns: 1fr 0.72fr; gap: 32px; }
+    .toolbox-banner { display: block; }
     .feature-list li::before { color: var(--primary); background: transparent; font-size: 0.9rem; }
 
     .acknowledgement {
@@ -1387,7 +1391,8 @@
       }
       .hero-visual { min-height: 470px; }
       h1 { font-size: 2.05rem; }
-      .toolbox-banner { grid-template-columns: 1fr; }
+      .toolbox-banner { display: block; }
+      .methods-table-grid { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 680px) {
@@ -1740,7 +1745,7 @@
 
     .pdf-overview-figure figcaption a { display: inline; border: 0; color: var(--primary); }
 
-    .toolbox-banner { gap: 24px; }
+    .toolbox-banner { display: block; }
     .feature-list { margin: 17px 0; }
     .feature-list li { margin-bottom: 6px; color: #3f3f3f; font-size: 0.95rem; }
 
@@ -1957,16 +1962,10 @@
       height: auto;
     }
 
-    .figure-caption,
     .figure-note {
       color: #666666;
       font-size: 0.94rem;
       line-height: 1.6;
-    }
-
-    .figure-caption {
-      margin: 9px 0 0;
-      text-align: center;
     }
 
     .figure-note { margin: 12px 0 25px; }
@@ -2078,7 +2077,6 @@
           <a href="images_pdf/benchmark_protocol.pdf" target="_blank" rel="noopener">
             <img src="assets/figures/obb-few-data-protocol.webp" alt="OBB-Few data protocol and six-dataset construction overview" loading="lazy">
           </a>
-          <figcaption class="figure-caption">Overview of scene isolation, dataset construction, and the six OBB-Few datasets. <a href="images_pdf/benchmark_protocol.pdf" target="_blank" rel="noopener">Open the original PDF</a>.</figcaption>
         </figure>
         <p class="figure-note">The protocol separates abundant base data from balanced few-shot support data through class-level, file-level, and cross-scene isolation. The six reconstructed datasets cover optical, infrared, SAR, fine-grained ship, and large-scale satellite imagery.</p>
 
@@ -2147,15 +2145,17 @@
           <a href="images_pdf/benchmark_mmrotate.pdf" target="_blank" rel="noopener">
             <img src="assets/figures/mmrotate-few-method.webp" alt="MMRotate-Few two-stage few-shot detection paradigm and supported method families" loading="lazy">
           </a>
-          <figcaption class="figure-caption">Overview of the MMRotate-Few two-stage detection paradigm and supported method families. <a href="images_pdf/benchmark_mmrotate.pdf" target="_blank" rel="noopener">Open the original PDF</a>.</figcaption>
         </figure>
         <p class="figure-note">MMRotate-Few standardizes the oriented detection pipeline while grouping representative methods by their learning strategy, including distillation, feature calibration, sample reweighting, and classifier decoupling.</p>
         <div class="toolbox-banner">
           <div>
-            <ul class="feature-list"><li>17 representative FSOD methods ported to oriented detection</li><li>Flexible backbone interfaces: ResNet-50/101, Swin-B, SkySense</li><li>Unified Oriented R-CNN pipeline with rotated NMS</li><li>Compatible with all 6 OBB-Few reconstructed datasets</li><li>Reproducible split files and evaluation scripts</li></ul>
+            <ul class="feature-list"><li>17 representative FSOD methods ported to oriented detection</li><li>Flexible backbone interfaces: ResNet-50/101, Swin-Large, SkySense</li><li>Unified Oriented R-CNN pipeline with rotated NMS</li><li>Compatible with all 6 OBB-Few reconstructed datasets</li><li>Reproducible split files and evaluation scripts</li></ul>
             <a class="action-button primary" href="#" aria-label="Open MMRotate-Few on GitHub"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 22v-3.9c.04-1-.35-1.96-1.1-2.64 3.6-.4 7.4-1.77 7.4-8A6.24 6.24 0 0 0 19.64 3c.26-.82.26-1.7 0-2.5 0 0-1.04-.34-3.64 1.66a12.7 12.7 0 0 0-6.55 0C6.85.16 5.8.5 5.8.5a6.2 6.2 0 0 0 0 2.5 6.25 6.25 0 0 0-1.65 4.48c0 6.22 3.78 7.59 7.38 8-.74.67-1.13 1.61-1.1 2.61V22"/></svg>MMRotate-Few GitHub</a>
           </div>
-          <div class="table-wrap methods-table"><table><thead><tr><th>Method</th><th>Venue</th></tr></thead><tbody><tr><td>TFA</td><td>ICML 2020</td></tr><tr><td>BRL</td><td>ICASSP 2020</td></tr><tr><td>TRAML</td><td>CVPR 2020</td></tr><tr><td>DeFRCN</td><td>ICCV 2021</td></tr><tr><td>DCFS</td><td>NeurIPS 2022</td></tr><tr><td>MFDC</td><td>ECCV 2022</td></tr><tr><td>CFA</td><td>CVPR 2022W</td></tr><tr><td>ST-FSOD</td><td>TGRS 2023</td></tr><tr><td>G-FSDet</td><td>ISPRS 2023</td></tr><tr><td>DiGeo</td><td>CVPR 2023</td></tr><tr><td>UNP</td><td>TCSVT 2024</td></tr><tr><td>RP-FSOD</td><td>TCSV 2024</td></tr><tr><td>T-RCNN</td><td>TOMM 2024</td></tr><tr><td>SAE-FSDet</td><td>TGRS 2024</td></tr><tr><td>FOMC</td><td>TGRS 2025</td></tr><tr><td>BDKMR</td><td>JAS 2025</td></tr><tr><td>PoE</td><td>TPAMI 2026</td></tr></tbody></table></div>
+          <div class="methods-table-grid" aria-label="MMRotate-Few method references">
+            <div class="table-wrap methods-table"><table><thead><tr><th>Method</th><th>Venue</th></tr></thead><tbody><tr><td>TFA</td><td>ICML 2020</td></tr><tr><td>BRL</td><td>ICASSP 2020</td></tr><tr><td>TRAML</td><td>CVPR 2020</td></tr><tr><td>DeFRCN</td><td>ICCV 2021</td></tr><tr><td>DCFS</td><td>NeurIPS 2022</td></tr><tr><td>MFDC</td><td>ECCV 2022</td></tr><tr><td>CFA</td><td>CVPRW 2022</td></tr><tr><td>ST-FSOD</td><td>TGRS 2023</td></tr><tr><td>G-FSDet</td><td>ISPRS 2023</td></tr></tbody></table></div>
+            <div class="table-wrap methods-table"><table><thead><tr><th>Method</th><th>Venue</th></tr></thead><tbody><tr><td>DiGeo</td><td>CVPR 2023</td></tr><tr><td>UNP</td><td>TCSVT 2024</td></tr><tr><td>RP-FSOD</td><td>TCSV 2024</td></tr><tr><td>T-RCNN</td><td>TOMM 2024</td></tr><tr><td>SAE-FSDet</td><td>TGRS 2024</td></tr><tr><td>FOMC</td><td>TGRS 2025</td></tr><tr><td>BDKMR</td><td>JAS 2025</td></tr><tr><td>PoE</td><td>TPAMI 2026</td></tr></tbody></table></div>
+          </div>
         </div>
       </div>
     </section>
