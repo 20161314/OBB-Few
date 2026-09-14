@@ -1874,9 +1874,11 @@
     body {
       font-size: 17px;
       line-height: 1.64;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
 
-    .nav-links a { font-size: 0.8rem; }
+    .brand { font-size: 1.28rem; font-weight: 600; }
+    .nav-links a { font-size: 1.08rem; font-weight: 500; }
     .subtitle { font-size: 0.98rem; }
     .authors { font-size: 0.96rem; }
     .abstract,
@@ -1906,15 +1908,81 @@
     pre { font-size: 0.78rem; line-height: 1.5; }
     footer { font-size: 0.82rem; }
 
+    .highlight-card {
+      display: block;
+      color: inherit;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .highlight-card:hover,
+    .highlight-card:focus-visible {
+      color: inherit;
+      background: #fafafa;
+      outline: 2px solid rgba(70, 130, 180, 0.35);
+      outline-offset: 4px;
+    }
+
+    .figure-placeholder {
+      display: grid;
+      min-height: 250px;
+      margin: 22px 0 0;
+      place-items: center;
+      border: 1px dashed #b8b8b8;
+      color: #777777;
+      background: #f7f7f5;
+      text-align: center;
+    }
+
+    .figure-placeholder span {
+      padding: 18px;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .pdf-figure {
+      margin: 22px 0 0;
+    }
+
+    .pdf-figure a {
+      display: block;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: #ffffff;
+    }
+
+    .pdf-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .figure-caption,
+    .figure-note {
+      color: #666666;
+      font-size: 0.94rem;
+      line-height: 1.6;
+    }
+
+    .figure-caption {
+      margin: 9px 0 0;
+      text-align: center;
+    }
+
+    .figure-note { margin: 12px 0 25px; }
+
     @media (max-width: 680px) {
       body { font-size: 16.5px; }
       h1 { font-size: 1.6rem; }
+      .brand { font-size: 1.16rem; }
+      .nav-links a { font-size: 1.06rem; }
       .section-heading { font-size: 1.2rem; }
       .abstract,
       .section-intro { font-size: 1rem; line-height: 1.62; }
       .dataset-heading { font-size: 1.16rem; }
       .dataset-meta { font-size: 0.9rem; }
       pre { font-size: 0.76rem; }
+      .figure-placeholder { min-height: 190px; }
     }
   </style>
 </head>
@@ -1951,7 +2019,6 @@
       </div>
       <div class="container hero-content">
         <h1><span class="title-mark">OBB-Few:</span> A Comprehensive Benchmark for Few-Shot Oriented Object Detection in Real-World Remote Sensing Scenarios</h1>
-        <p class="subtitle">IEEE Transactions on Pattern Analysis and Machine Intelligence (Under Review)</p>
         <p class="authors">Anonymous Authors</p>
         <div class="hero-actions" aria-label="Project resources">
           <a class="action-button primary" href="#" aria-label="Read the paper">
@@ -1969,81 +2036,59 @@
         </div>
       </div>
     </div>
-    <div class="container">
-      <p class="abstract"><strong>Abstract.</strong> Few-shot oriented object detection (FSOOD) aims to adapt remote-sensing detectors to emerging geospatial categories from only a few rotated-box annotations. Existing protocols usually sample base-training and novel-support images from the same collections, allowing repeated geographic context to leak across stages. We introduce OBB-Few, a deployment-oriented protocol and benchmark suite that enforces cross-stage scene isolation on six datasets spanning optical, infrared, SAR, large-scale satellite, UAV, and fine-grained ship scenarios.</p>
-    </div>
   </header>
 
   <main>
     <section id="highlights" aria-labelledby="highlights-title">
       <div class="container">
         <h2 class="section-heading" id="highlights-title">Highlights</h2>
+        <p class="section-intro">OBB-Few brings together a scene-isolated six-dataset protocol, a unified oriented few-shot detection toolkit, and a benchmark for comparing representative methods under consistent evaluation settings.</p>
         <div class="highlights-grid">
-          <article class="highlight-card">
+          <a class="highlight-card" href="#datasets" aria-label="Jump to data protocol and dataset construction">
             <span class="highlight-icon" aria-hidden="true">
               <svg class="button-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2.2 4.8-4.8 2.2 2.2-4.8z"/></svg>
             </span>
-            <h3>Scene Isolation Protocol</h3>
-            <p>Cross-stage scene isolation via perceptual-hash filtering across six datasets.</p>
-          </article>
-          <article class="highlight-card">
+            <h3>Data Protocol &amp; Dataset Construction</h3>
+            <p>Six remote-sensing datasets built with scene-isolated base and few-shot support pools.</p>
+          </a>
+          <a class="highlight-card" href="#toolbox" aria-label="Jump to the MMRotate-Few toolbox">
             <span class="highlight-icon" aria-hidden="true">
               <svg class="button-icon" viewBox="0 0 24 24"><path d="M4 19V8M10 19V4M16 19v-7M22 19H2"/></svg>
             </span>
-            <h3>IAO Conflict Analysis</h3>
-            <p>Formal identification of cross-stage and intra-stage incomplete-annotation conflicts.</p>
-          </article>
-          <article class="highlight-card">
+            <h3>MMRotate-Few</h3>
+            <p>A unified toolkit for adapting representative few-shot detectors to oriented bounding boxes.</p>
+          </a>
+          <a class="highlight-card" href="#benchmark" aria-label="Jump to benchmark evaluation results">
             <span class="highlight-icon" aria-hidden="true">
               <svg class="button-icon" viewBox="0 0 24 24"><path d="m4 14 6-6 4 4 6-6M20 6v5M20 6h-5"/></svg>
             </span>
-            <h3>SCL Method</h3>
-            <p>Class-adaptive dynamic masking with two-stage decoupled classification.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="protocol" aria-labelledby="protocol-title">
-      <div class="container">
-        <h2 class="section-heading" id="protocol-title">OBB-Few Benchmark Protocol</h2>
-        <p class="section-intro">OBB-Few enforces cross-stage scene isolation between base-training and fine-tuning stages. Unlike conventional protocols that draw images from the same collection, OBB-Few requires that no context-equivalent observations appear across stages. This is enforced via file-level exclusion and perceptual-hash (pHash) filtering with Hamming distance threshold <strong>&tau; = 10</strong>.</p>
-
-        <div class="protocol-flow" aria-label="OBB-Few benchmark construction flow">
-          <div class="flow-step"><strong>Base Training Pool</strong><span>Source images with base-class annotations</span></div>
-          <span class="flow-arrow" aria-hidden="true"></span>
-          <div class="flow-step"><strong>Scene Isolation</strong><span>File exclusion + pHash distance filtering</span></div>
-          <span class="flow-arrow" aria-hidden="true"></span>
-          <div class="flow-step"><strong>Novel Support Pool</strong><span>Scene-disjoint K-shot adaptation samples</span></div>
-        </div>
-
-        <h3 class="subheading">Incomplete Annotation of Objects (IAO)</h3>
-        <div class="conflict-grid">
-          <article class="conflict-card">
-            <h3>CS-IAO (Cross-Stage)</h3>
-            <p>During base training, novel-class objects are unlabeled and optimized as background, creating a “novel-as-background” prior before fine-tuning begins.</p>
-          </article>
-          <article class="conflict-card">
-            <h3>IS-IAO (Intra-Stage)</h3>
-            <p>During few-shot adaptation, annotated and hidden foreground objects coexist in the same support image, receiving contradictory foreground/background supervision.</p>
-          </article>
-        </div>
-
-        <h3 class="subheading">OBB-Few Dataset Benchmark Overview</h3>
-        <figure class="pdf-overview-figure">
-          <a href="images_pdf/benchmark.pdf" target="_blank" rel="noopener">
-            <img src="assets/figures/obb-few-benchmark.webp" alt="OBB-Few benchmark overview with dataset statistics and protocol settings" loading="lazy">
+            <h3>Benchmark Evaluation</h3>
+            <p>Comparison results across six datasets, three novel splits, and multiple shot settings.</p>
           </a>
-          <figcaption>Dataset statistics and benchmark protocol overview. <a href="images_pdf/benchmark.pdf" target="_blank" rel="noopener">Open the original PDF</a>.</figcaption>
-        </figure>
-
+        </div>
       </div>
     </section>
 
     <section id="datasets" aria-labelledby="datasets-title">
       <div class="container">
-        <h2 class="section-heading" id="datasets-title">Datasets</h2>
-        <p class="section-intro">OBB-Few comprises six reconstructed remote-sensing datasets across optical aerial imagery, satellite imagery, synthetic aperture radar, infrared UAV sensing, and fine-grained ship recognition. Each dataset follows the same scene-isolated few-shot protocol.</p>
+        <h2 class="section-heading" id="datasets-title">Data Protocol and Dataset Construction</h2>
+        <p class="section-intro">OBB-Few enforces scene isolation between base training and few-shot adaptation. Across six remote-sensing datasets, source images are separated at the file level and filtered with perceptual hashing so that context-equivalent observations do not leak between stages. Each dataset then provides a consistent set of base classes, novel classes, and few-shot support settings for oriented object detection.</p>
+
+        <figure class="pdf-figure">
+          <a href="images_pdf/benchmark_protocol.pdf" target="_blank" rel="noopener">
+            <img src="assets/figures/obb-few-data-protocol.webp" alt="OBB-Few data protocol and six-dataset construction overview" loading="lazy">
+          </a>
+          <figcaption class="figure-caption">Overview of scene isolation, dataset construction, and the six OBB-Few datasets. <a href="images_pdf/benchmark_protocol.pdf" target="_blank" rel="noopener">Open the original PDF</a>.</figcaption>
+        </figure>
+        <p class="figure-note">The protocol separates abundant base data from balanced few-shot support data through class-level, file-level, and cross-scene isolation. The six reconstructed datasets cover optical, infrared, SAR, fine-grained ship, and large-scale satellite imagery.</p>
+
+      </div>
+    </section>
+
+    <section id="dataset-details" aria-labelledby="dataset-details-title">
+      <div class="container">
+        <h2 class="section-heading" id="dataset-details-title">Datasets</h2>
+        <p class="section-intro">The six reconstructed datasets cover optical aerial and satellite imagery, synthetic aperture radar, infrared UAV sensing, and fine-grained ship recognition. Each entry below lists its source, modality, and representative train, validation, and test imagery.</p>
         <div class="datasets-list">
       <article class="dataset-section" id="dota" aria-labelledby="dota-title">
         <h3 class="dataset-heading" id="dota-title">AeroOpt-Few</h3>
@@ -2097,14 +2142,16 @@
     <section id="toolbox" aria-labelledby="toolbox-title">
       <div class="container">
         <h2 class="section-heading" id="toolbox-title">MMRotate-Few: Unified Evaluation Toolkit</h2>
-        <div class="toolbox-figure-placeholder pdf-figure" role="img" aria-label="MMRotate-Few overview figure">
-          <a href="images_pdf/over_review.pdf" target="_blank" rel="noopener">
-            <img src="assets/figures/mmrotate-few-over-review.webp" alt="MMRotate-Few overview showing the unified oriented detection toolkit and supported methods" loading="lazy">
+        <p class="section-intro">MMRotate-Few provides a unified evaluation environment for few-shot oriented object detection, with shared data interfaces, rotated-box components, training recipes, and evaluation scripts.</p>
+        <figure class="pdf-figure">
+          <a href="images_pdf/benchmark_mmrotate.pdf" target="_blank" rel="noopener">
+            <img src="assets/figures/mmrotate-few-method.webp" alt="MMRotate-Few two-stage few-shot detection paradigm and supported method families" loading="lazy">
           </a>
-        </div>
+          <figcaption class="figure-caption">Overview of the MMRotate-Few two-stage detection paradigm and supported method families. <a href="images_pdf/benchmark_mmrotate.pdf" target="_blank" rel="noopener">Open the original PDF</a>.</figcaption>
+        </figure>
+        <p class="figure-note">MMRotate-Few standardizes the oriented detection pipeline while grouping representative methods by their learning strategy, including distillation, feature calibration, sample reweighting, and classifier decoupling.</p>
         <div class="toolbox-banner">
           <div>
-            <p class="section-intro">MMRotate-Few is a unified evaluation toolkit built on MMRotate and Oriented R-CNN. It ports 17 representative few-shot object detection methods to the rotated detection setting by standardizing detection heads, anchor generators, box coders, RoI assignment, rotated NMS, and evaluation scripts while preserving each method's original learning objective.</p>
             <ul class="feature-list"><li>17 representative FSOD methods ported to oriented detection</li><li>Flexible backbone interfaces: ResNet-50/101, Swin-B, SkySense</li><li>Unified Oriented R-CNN pipeline with rotated NMS</li><li>Compatible with all 6 OBB-Few reconstructed datasets</li><li>Reproducible split files and evaluation scripts</li></ul>
             <a class="action-button primary" href="#" aria-label="Open MMRotate-Few on GitHub"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 22v-3.9c.04-1-.35-1.96-1.1-2.64 3.6-.4 7.4-1.77 7.4-8A6.24 6.24 0 0 0 19.64 3c.26-.82.26-1.7 0-2.5 0 0-1.04-.34-3.64 1.66a12.7 12.7 0 0 0-6.55 0C6.85.16 5.8.5 5.8.5a6.2 6.2 0 0 0 0 2.5 6.25 6.25 0 0 0-1.65 4.48c0 6.22 3.78 7.59 7.38 8-.74.67-1.13 1.61-1.1 2.61V22"/></svg>MMRotate-Few GitHub</a>
           </div>
@@ -2301,13 +2348,13 @@
       const links = [...navLinks.querySelectorAll('a')];
       const sectionGroup = {
         highlights: 'overview',
-        protocol: 'overview',
         dota: 'datasets',
         dior: 'datasets',
         rsar: 'datasets',
         fgsrcs: 'datasets',
         dronevehicle: 'datasets',
-        star: 'datasets'
+        star: 'datasets',
+        'dataset-details': 'datasets'
       };
       const updateScrollState = () => {
         const scrollable = document.documentElement.scrollHeight - window.innerHeight;
